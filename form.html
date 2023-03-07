@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>CRUD Form</title>
+	<!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+	<!-- Add Custom CSS -->
+	<style>
+		.container {
+			margin-top: 50px;
+		}
+		.form-heading {
+			font-size: 24px;
+			font-weight: bold;
+			margin-bottom: 30px;
+		}
+		.btn-add, .btn-update, .btn-delete {
+			margin-top: 10px;
+		}
+		.data-item {
+			padding: 10px;
+			border: 1px solid #ccc;
+			margin-bottom: 10px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+		.data-item .btn {
+			margin-left: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6">
+				<h2 class="form-heading">Add New Item</h2>
+				<form id="add-form">
+					<div class="form-floating mb-3">
+						<input type="text" class="form-control" id="name" name="name" required>
+						<label for="name">Name</label>
+					</div>
+					<div class="form-floating mb-3">
+						<input type="email" class="form-control" id="email" name="email" required>
+						<label for="email">Email</label>
+					</div>
+					<div class="form-floating mb-3">
+						<input type="tel" class="form-control" id="phone" name="phone">
+						<label for="phone">Phone</label>
+					</div>
+					<button type="submit" class="btn btn-primary btn-add">Add Item</button>
+					<button type="button" class="btn btn-secondary btn-update">Update Item</button>
+					<button type="button" class="btn btn-danger btn-delete">Delete Item</button>
+				</form>
+			</div>		
+            <div class="row">
+			<div class="col-md-6">
+				<h2 class="form-heading">Data Items</h2>
+				<div id="data"></div>
+			</div>
+            </div>
+		</div>
+	</div>
+	
+	<!-- Add Bootstrap JS and jQuery -->
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize data array
+            var data = [];
+    
+            // Load data items from local storage
+            if (localStorage.getItem("data")) {
+                data = JSON.parse(localStorage.getItem("data"));
+                loadDataItems(data);
+            }
+    
+            // Handle add form submission
+            $("#add-form").submit(function(event) {
+                event.preventDefault();
+    
+                // Get form data
+                var formData = {
+                    "id": data.length + 1,
+                    "name": $("#name").val(),
+                    "email": $("#email").val(),
+                    "phone": $("#phone").val()
+                };
+    
+                // Add form data to data array
+                data.push(formData);
+    
+                // Save data array to local storage
+                localStorage.setItem("data", JSON.stringify(data));
+    
+                // Clear form fields
+                $("#name").val("");
+                $("#email").val("");
+                $("#phone").val("");
+    
+                // Reload data items
+                loadDataItems(data);
+            });
+    
+            // Handle update button click
+            $(".btn-update").click(function() {
+                // Get selected data item
+                var id = $("input[name='data-item']:checked").val();
+    
+                // Find data item in array
+                var index = data.findIndex(x => x.id == id);
+    
+                // Update data item fields
+                data[index].name = $("#name").val();
+                data[index].email = $("#email").val();
+                data[index].phone = $("#phone").val();
+    
+                // Save data array to local storage
+                localStorage.setItem("data", JSON.stringify(data));
+    
+                // Clear form fields
+                $("#name").val("");
+                $("#email").val("");
+                $("#phone").val("");
+    
+                // Reload data items
+                loadDataItems(data);
+            });
+    
+            // Handle delete button click
+            $(".btn-delete").click(function() {
+                // Get selected data item
+                var id = $("input[name='data-item']:checked").val();
+    
+                // Find data item in array
+                var index = data.findIndex(x => x.id == id);
+    
+                // Remove data item from array
+                data.splice(index, 1);
+    
+                // Save data array to local storage
+                localStorage.setItem("data", JSON.stringify(data));
+    
+                // Reload data items
+                loadDataItems(data);
+            });
+    
+            // Load data items into table
+            function loadDataItems(data) {
+                var html = "";
+                data.forEach(function(item) {
+                    html += '<div class="data-item">';
+                    html += '<input type="radio" name="data-item" value="' + item.id + '">';
+                    html += '<div class="row">';
+                    html += '<div class="col-md-4">' + item.name + '</div>';
+                    html += '<div class="col-md-4">' + item.email + '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+                $("#data").html(html);
+            }
+        });
+    </script>
+    </body>
+    </html>
+    
